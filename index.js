@@ -4,6 +4,7 @@
  * Module dependencies
  */
 var	debug = require('debug')('dpd-admin'),
+    url = require('url'),
     fs = require('fs'),
     path = require('path'),
 	  util = require('util'),
@@ -21,23 +22,29 @@ util.inherits(Admin, Collection);
 Admin.events = ["Get"];
 Admin.dashboard = Collection.dashboard;
 
+
+function getFilenameFromUrl(urlToParse, adminPath) {
+  var pathname = url
+    .parse(urlToParse)
+    .pathname
+    .replace(adminPath, '');
+  return !pathname || pathname === '/' ? '/index.html' : pathname;
+}
+
 /**
  * Module methods
  */
 Admin.prototype.handle = function (ctx, next) {
 	ctx.query.id = ctx.query.id || this.parseId(ctx) || (ctx.body && ctx.body.id);
 	var req = ctx.req,
-		self = this;
+		self = this,
+    adminPath = this.path;
 
 	if (req.method === "GET") {
-    console.log(__dirname)
-    var fileLocation = fs.realpathSync(path.join(__dirname, clientAppPath, 'index.html'));
-    console.log(fileLocation);
+    var fileLocation = path.join(__dirname, clientAppPath);
     ctx.res.setHeader('content-type', 'text/html');
-
-    var fileData = fs.readFileSync(fileLocation);
-    console.log(fileData)
-    ctx.done(null, fileData);
+    var fileData = fs.readFileSync(fileLocation + getFilenameFromUrl(req.url, adminPath));
+    ctx.done(null, fileData.toString());
 	} else {
 		Collection.prototype.handle.apply(this, [ctx, next]);
 	}
