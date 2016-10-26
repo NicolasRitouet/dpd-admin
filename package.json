@@ -1,0 +1,11 @@
+{
+  "name": "dpd-admin",
+  "version": "0.0.1",
+  "description": "Deployd module to add an admin panel",
+  "main": "index.js",
+  "author": "Nicolas Ritouet <nicolas@ritouet.com>",
+  "license": "MIT",
+  "dependencies": {
+    "deployd": "^0.8.9"
+  }
+}
